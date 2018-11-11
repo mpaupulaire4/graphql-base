@@ -37,7 +37,9 @@ const User =  {
 }
 
 const Schema = `
-  ${waterlineToGQL(User, null, ['password'])}
+  ${waterlineToGQL(User, {
+    filter: ['password']
+  })}
 
   extend type Query {
     users: [User!]!

@@ -1,8 +1,6 @@
 const Waterline = require('waterline')
 const { merge } = require('lodash')
-const WaterlineConfig = require('./waterline.config')
-
-const BaseModel = WaterlineConfig.models
+const { models: BaseModel } = require('../Data/waterline.config')
 
 const WaterlineGraphQLTypeMap = {
   string: 'String',
@@ -28,7 +26,8 @@ function getTypeFromAttr({ type, collection, model, GType, required }) {
   return [WaterlineGraphQLTypeMap[type], required ? '!' : ''].join('')
 }
 
-function parse({identity, attributes}, extra, filter = []) {
+function waterlineToGQL(config, {defs ='', filter = []} = {}) {
+  const { identity, attributes } = merge({}, BaseModel, config)
   const name = capitalize(identity)
   const base = `type ${name} {`
   const fields = Object.keys(attributes).map((key) => {
@@ -38,21 +37,16 @@ function parse({identity, attributes}, extra, filter = []) {
     const type = getTypeFromAttr(attributes[key])
     return `${key}:${type}`
   })
-  if (extra){
-    fields.push(extra)
+  if (defs){
+    fields.push(defs)
   }
   return [base, ...fields, '}'].join('\n')
-}
-
-function waterlineToGQL(config, extra ='', filter = []) {
-  return parse(merge({}, BaseModel, config), extra, filter)
 }
 
 
 function capitalize(string='') {
   return string.replace(/^\w/, c => c.toUpperCase())
 }
-
 
 function setGType(obj) {
   return Object.keys(obj).reduce((agg, key) => {
