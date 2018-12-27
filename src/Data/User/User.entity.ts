@@ -11,12 +11,6 @@ export class User extends BaseEntity {
   name: string;
 
   @Column()
-  image: string;
-
-  @Column()
-  phonenumber: string;
-
-  @Column()
   password: string;
 
   @Column({ unique: true })

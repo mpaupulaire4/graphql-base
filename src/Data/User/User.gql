@@ -5,10 +5,6 @@ type User {
 
   email: String!
 
-  image: URL!
-
-  phonenumber: String
-
 }
 
 type Query {
@@ -38,7 +34,6 @@ type Mutation {
 input UserCreate {
   name: String!
   email: EmailAddress!
-  phonenumber: String
   password: String!
   passwordConfirm: String!
 }
@@ -47,7 +42,6 @@ input UserUpdate {
   id: ID!
   name: String
   email: EmailAddress
-  phonenumber: String
   password: String
   passwordConfirm: String
 }
