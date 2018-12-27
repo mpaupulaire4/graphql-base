@@ -1,0 +1,26 @@
+{
+   "compilerOptions": {
+      "lib": [
+         "es5",
+         "es6",
+         "esnext"
+      ],
+      "target": "es5",
+      "module": "commonjs",
+      "moduleResolution": "node",
+      "outDir": "build",
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "sourceMap": true,
+      "allowJs": false,
+      "forceConsistentCasingInFileNames": true,
+      // "noImplicitAny": true,
+      "noImplicitReturns": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true,
+      "strictNullChecks": true
+   },
+   "include": [
+      "src/index.ts",
+   ],
+}

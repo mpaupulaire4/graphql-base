@@ -1,23 +1,21 @@
-const express = require('express')
-const passport = require('passport')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-const Local = require('passport-local')
-const JWT = require('passport-jwt')
-const { ModelsPromise } = require('../Schema')
+import { Router } from 'express'
+import * as passport from 'passport'
+import * as jwt from 'jsonwebtoken'
+import * as Local from 'passport-local'
+import * as JWT from 'passport-jwt'
+import { User } from '../Data/User/User.entity'
 
 passport.use(new Local.Strategy({
   usernameField: 'email',
   passwordField: 'password'
-}, async (email, password, done) => {
+}, async (email: string, password: string, done: Function) => {
   try {
-    const Models = await ModelsPromise
-    const user = await Models.user.findOne({ email })
+    const user = await User.findOne({ email })
     if (!user) {
       return done(null, false, { messages: 'Incorrect username or password' })
     }
 
-    const match = await bcrypt.compare(password, user.password)
+    const match = await user.isPassword(password)
     if (!match) {
       return done(null, false, { messages: 'Incorrect username or password' })
     }
@@ -31,10 +29,9 @@ passport.use(new Local.Strategy({
 passport.use(new JWT.Strategy({
   jwtFromRequest: JWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
   secretOrKey: process.env.TOKEN_SECRET,
-}, async (data, done) => {
+}, async (data: JWTInfo, done: Function) => {
   try {
-    const Models = await ModelsPromise
-    const user = await Models.user.findOne({ id: data.id })
+    const user = await User.findOne({ id: data.id }, { relations: ['organization'] })
     if (!user) {
       return done(null, false)
     }
@@ -45,7 +42,7 @@ passport.use(new JWT.Strategy({
   }
 }))
 
-const router = express.Router()
+const router = Router()
 
 router.post('/login', (req, res) => {
   passport.authenticate('local', { session: false }, (err, user, info) => {
@@ -56,7 +53,7 @@ router.post('/login', (req, res) => {
       console.error(err)
       return res.status(400).send(err)
     }
-    const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET, { expiresIn: '7d' })
+    const token = jwt.sign({ id: user.id } as JWTInfo, process.env.TOKEN_SECRET, { expiresIn: '7d' })
     res.set({
       Authorization : `Bearer ${token}`
     })
@@ -66,7 +63,11 @@ router.post('/login', (req, res) => {
 
 const authenticate = passport.authenticate('jwt', { session: false })
 
-module.exports = {
+export {
   router,
   authenticate,
+}
+
+interface JWTInfo {
+  id: number
 }

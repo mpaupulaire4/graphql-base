@@ -1,0 +1,10 @@
+scalar DateTime
+scalar Time
+scalar EmailAddress
+scalar NegativeFloat
+scalar NegativeInt
+scalar PhoneNumber
+scalar PostalCode
+scalar UnsignedFloat
+scalar UnsignedInt
+scalar URL

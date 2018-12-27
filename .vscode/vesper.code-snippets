@@ -1,0 +1,128 @@
+{
+	// Place your global snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and
+	// description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope
+	// is left empty or omitted, the snippet gets applied to all languages. The prefix is what is
+	// used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+	// $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders.
+	// Placeholders with the same ids are connected.
+	// Example:
+	// "Print to console": {
+	// 	"scope": "javascript,typescript",
+	// 	"prefix": "log",
+	// 	"body": [
+	// 		"console.log('$1');",
+	// 		"$2"
+	// 	],
+	// 	"description": "Log output to console"
+	// }
+	"Generate a Typeorm Entity": {
+		"prefix": "typent",
+		"body": [
+			"import { Entity, PrimaryGeneratedColumn, Column, BaseEntity} from \"typeorm\";",
+			"",
+			"@Entity()",
+			"export class $1 extends BaseEntity {",
+			"",
+			"    @PrimaryGeneratedColumn()",
+			"    id: number;",
+			"",
+			"    $0",
+			"",
+			"}"
+		],
+		"description": "Generate a Typeorm Entity"
+	},
+	"Generate a Typeorm column": {
+		"prefix": "typecol",
+		"body": [
+			"@Column()",
+			"$1: $2;"
+		],
+		"description": "Generate a Typeorm column"
+	},
+	"Generate a Vesper Controller": {
+		"prefix": "vespcont",
+		"body": [
+			"import { Controller, Query, Mutation } from \"vesper\";",
+			"import { AuthorizationService } from '../services/Authorization'",
+			"import { $1 } from './$1.entity'",
+			"import { Role } from '../Role/Role.entity'",
+			"",
+			"",
+			"@Controller()",
+			"export class $1Controller {",
+			"  constructor(",
+			"    private auth: AuthorizationService",
+			"  ) {}",
+			"",
+			"  @Query()",
+			"  $2() {",
+			"    return $1.find()",
+			"  }",
+			"",
+			"  @Mutation()",
+			"  async create$1 ({ data }) {",
+			"    this.auth.needsRoles([",
+			"      Role.ADMIN,",
+			"    ])",
+			"    return $1.create(data).save()",
+			"  }",
+			"",
+			"  @Mutation()",
+			"  async update$1({ data: { id, ...data } }) {",
+			"    this.auth.needsRoles([",
+			"      Role.ADMIN,",
+			"    ])",
+			"    return $1.update(id, data)",
+			"  }",
+			"",
+			"  @Mutation()",
+			"  async delete$1 ({ id }){",
+			"    this.auth.needsRoles([",
+			"      Role.ADMIN",
+			"    ])",
+			"    return $1.delete(id)",
+			"  }",
+			"",
+			"}"
+		],
+		"description": "Generate a Vesper Controller"
+	},
+	"Generate a Vesper Resolver": {
+		"prefix": "vespres",
+		"body": [
+			"import { Resolver, ResolverInterface, Resolve } from \"vesper\";",
+			"import { $1 } from \"./$1.entity\";",
+			"",
+			"@Resolver($1)",
+			"export class $1Resolver implements ResolverInterface<$1> {",
+			"",
+			"}"
+		],
+		"description": "Generate a Vesper Resolver"
+	},
+	"Generate a Vesper Module": {
+		"prefix": "vespmod",
+		"body": [
+			"import { GraphModule } from \"vesper\";",
+			"import { $1Resolver } from \"./$1.resolver\";",
+			"import { $1Controller } from \"./$1.controller\";",
+			"import { $1 } from \"./$1.entity\";",
+			"",
+			"export class $1Module implements GraphModule {",
+			"  resolvers = [",
+			"    $1Resolver",
+			"  ];",
+			"",
+			"  controllers = [",
+			"    $1Controller",
+			"  ];",
+			"",
+			"  entities = [",
+			"    $1",
+			"  ]",
+			"}"
+		],
+		"description": "Generate a Vesper Module"
+	}
+}
