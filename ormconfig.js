@@ -1,6 +1,6 @@
-{
+module.exports = {
    "type": "sqljs",
-   "location": "./synctimes.db",
+   "location": "./database.db",
    "autoSave": true,
    "synchronize": true,
    "logging": false,

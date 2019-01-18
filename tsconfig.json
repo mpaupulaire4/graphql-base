@@ -8,13 +8,14 @@
       "target": "es5",
       "module": "commonjs",
       "moduleResolution": "node",
+      "rootDir": "src",
       "outDir": "build",
       "emitDecoratorMetadata": true,
       "experimentalDecorators": true,
       "sourceMap": true,
       "allowJs": false,
       "forceConsistentCasingInFileNames": true,
-      // "noImplicitAny": true,
+      "noImplicitAny": true,
       "noImplicitReturns": true,
       "noUnusedLocals": true,
       "noUnusedParameters": true,
@@ -22,5 +23,7 @@
    },
    "include": [
       "src/index.ts",
+      "src/server.ts",
+      "src/**/*.controller.ts"
    ],
 }

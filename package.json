@@ -7,8 +7,9 @@
     "node": ">=8.0.0"
   },
   "scripts": {
-    "serve": "nodemon -r dotenv/config ./src/index.ts --exec ts-node -e ts,gql",
+    "serve": "nodemon -r dotenv/config ./src/index.ts",
     "build": "tsc",
+    "lint": "tslint -c tslint.json src/**/*.ts",
     "prestart": "npm run build",
     "start": "node ./build/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,6 +17,7 @@
   "author": "Michel Paupulaire",
   "license": "MIT",
   "devDependencies": {
+    "@altamir/standards-tslint": "^1.0.4",
     "@playlyfe/gql": "^2.6.0",
     "@types/body-parser": "^1.17.0",
     "@types/compression": "^0.0.36",
@@ -26,6 +28,7 @@
     "nodemon": "^1.12.1",
     "sql.js": "^0.5.0",
     "ts-node": "^7.0.1",
+    "tslint": "^5.12.1",
     "typescript": "^3.2.1"
   },
   "dependencies": {
@@ -47,5 +50,16 @@
     "typedi": "^0.8.0",
     "typeorm": "^0.2.9",
     "vesper": "^0.1.9"
+  },
+  "nodemonConfig": {
+    "exec": "ts-node",
+    "watch": [
+      "src/**/*.ts",
+      "src/**/*.gql",
+      "src/**/*.json"
+    ],
+    "events": {
+      "start": "node -e 'console.clear()'"
+    }
   }
 }
