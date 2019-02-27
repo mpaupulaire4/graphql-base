@@ -1,18 +1,18 @@
-import { GraphModule } from "vesper";
-import { UserController } from "./User.controller";
-import { UserResolver } from "./User.resoler";
-import { User } from "./User.entity";
+import { GraphModule } from 'vesper';
+import { UserController } from './User.controller';
+import { User } from './User.entity';
+import { UserResolver } from './User.resoler';
 
 export class UserModule implements GraphModule {
-  controllers = [
-    UserController
+  public controllers = [
+    UserController,
   ];
 
-  resolvers = [
-    UserResolver
+  public resolvers = [
+    UserResolver,
   ];
 
-  entities = [
-    User
-  ]
+  public entities = [
+    User,
+  ];
 }

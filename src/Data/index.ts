@@ -1,58 +1,43 @@
-import { Application } from 'express'
 import {
   EmailAddress,
-  NegativeFloat,
-  NegativeInt,
-  PhoneNumber,
-  PostalCode,
-  UnsignedFloat,
-  UnsignedInt,
-  URL,
 } from '@okgrow/graphql-scalars';
+import { Application } from 'express';
 import {
   GraphQLDate,
-  GraphQLTime,
-  GraphQLDateTime
+  GraphQLDateTime,
+  GraphQLTime
 } from 'graphql-iso-date';
-import { bootstrap } from "vesper";
-import { PubSub } from 'graphql-subscriptions'
-import { pubsub } from '../Subscriptions'
+import { PubSub } from 'graphql-subscriptions';
+import { bootstrap } from 'vesper';
+import { pubsub } from '../Subscriptions';
 
-import { AuthorizationService } from './services/Authorization'
+import { AuthorizationService } from './services/Authorization';
 
 // Modules
-import { UserModule } from './User'
-
+import { UserModule } from './User';
 
 export async function SetUpGraqlQL(app: Application) {
-  const port = parseInt(process.env.PORT || '3100')
+  const port = parseInt(process.env.PORT || '3100', 10);
   return bootstrap({
-    port,
+    customResolvers: {
+      Date: GraphQLDate,
+      DateTime: GraphQLDateTime,
+      EmailAddress,
+      Time: GraphQLTime,
+    },
+    expressApp: app,
     modules: [
       UserModule,
     ],
-    schemas: ["**/*.gql"],
-    expressApp: app,
+    port,
+    schemas: ['**/*.gql'],
     setupContainer: (container, action) => {
-      const req = action.request || { user: undefined }
-      const { user } = req
-      container.set(AuthorizationService, new AuthorizationService(user))
-      container.set(PubSub, pubsub)
+      const req = action.request || { user: undefined };
+      const { user } = req;
+      container.set(AuthorizationService, new AuthorizationService(user));
+      container.set(PubSub, pubsub);
     },
-    subscriptionAsyncIterator: triggers => pubsub.asyncIterator(triggers),
-    customResolvers: {
-      Date: GraphQLDate,
-      Time: GraphQLTime,
-      DateTime: GraphQLDateTime,
-      EmailAddress,
-      NegativeFloat,
-      NegativeInt,
-      PhoneNumber,
-      PostalCode,
-      UnsignedFloat,
-      UnsignedInt,
-      URL,
-    }
+    subscriptionAsyncIterator: (triggers) => pubsub.asyncIterator(triggers),
   }).then(async () => {
     console.log(`Server is running on port ${port} 🚀`);
   }).catch((err) => console.log(err));

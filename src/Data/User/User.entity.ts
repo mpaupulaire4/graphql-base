@@ -1,53 +1,53 @@
-import * as bcrypt from 'bcrypt'
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
+import * as bcrypt from 'bcrypt';
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User extends BaseEntity {
 
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  name: string;
-
-  @Column()
-  password: string;
-
-  @Column({ unique: true })
-  email: string;
-
-  static hashPassword(pswd: string): string {
-    return bcrypt.hash(pswd, parseInt(process.env.SALT_ROUNDS || '5'))
+  public static hashPassword(pswd: string): string {
+    return bcrypt.hash(pswd, parseInt(process.env.SALT_ROUNDS || '5', 10));
   }
 
-  static async isPassword(user: User, password: string) {
-    return await bcrypt.compare(password, user.password)
+  public static async isPassword(user: User, password: string) {
+    return await bcrypt.compare(password, user.password);
   }
 
-  static async validatePassword(user: UserPasswordChange): Promise<void> {
+  public static async validatePassword(user: IUserPasswordChange): Promise<void> {
     if (
       user.password &&
       user.password === user.passwordConfirm &&
       this.isValidPassword(user.password)
     ) {
-      delete user.passwordConfirm
-      user.password = await this.hashPassword(user.password)
+      delete user.passwordConfirm;
+      user.password = await this.hashPassword(user.password);
     } else {
-      throw Error('Password does not meet requirements')
+      throw Error('Password does not meet requirements');
     }
   }
 
-  static isValidPassword(psswd: string): boolean {
-    return /\d/.test(psswd)
+  public static isValidPassword(psswd: string): boolean {
+    return /\d/.test(psswd);
   }
 
-  async isPassword(password: string): Promise<boolean> {
-    return await bcrypt.compare(password, this.password)
+  @PrimaryGeneratedColumn()
+  public id: number;
+
+  @Column()
+  public name: string;
+
+  @Column()
+  public password: string;
+
+  @Column({ unique: true })
+  public email: string;
+
+  public async isPassword(password: string): Promise<boolean> {
+    return await bcrypt.compare(password, this.password);
   }
 
 }
 
-interface UserPasswordChange {
-  password?: string
-  passwordConfirm?: string
+interface IUserPasswordChange {
+  password?: string;
+  passwordConfirm?: string;
 }

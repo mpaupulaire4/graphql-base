@@ -1,8 +1,33 @@
 {
-    "extends": [
-        "@altamir/standards-tslint"
-    ],
-    "rules": {
-        "member-access": false
+  "extends": "tslint:recommended",
+  "rules": {
+    "quotemark": {
+      "options": ["single", "jsx-double", "avoid-template", "avoid-escape"]
+    },
+    "semicolon": {
+      "options": ["always"]
+    },
+    "trailing-comma": {
+      "options": {
+        "multiline": {
+          "objects": "always",
+          "arrays": "always",
+          "functions": "never",
+          "typeLiterals": "always"
+        },
+        "esSpecCompliant": true
+      }
+    },
+    "member-access": true,
+    "no-magic-numbers": {
+      "options": { "ignore-jsx": true }
+    },
+    "only-arrow-functions": {
+      "options": ["allow-named-functions"]
+    },
+    "no-reference": false,
+    "no-console": {
+      "severity": "warning"
     }
+  }
 }

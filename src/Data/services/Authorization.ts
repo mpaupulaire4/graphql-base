@@ -1,5 +1,5 @@
-import { User } from '../User/User.entity'
-import { Service } from 'typedi'
+import { Service } from 'typedi';
+import { User } from '../User/User.entity';
 
 @Service()
 export class AuthorizationService {
@@ -9,7 +9,7 @@ export class AuthorizationService {
   ) {}
 
   get user(): User {
-    return this.currentUser
+    return this.currentUser;
   }
 
 }
