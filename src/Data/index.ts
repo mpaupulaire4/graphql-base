@@ -1,44 +1,41 @@
-import {
-  EmailAddress,
-} from '@okgrow/graphql-scalars';
-import { Application } from 'express';
+import { makeExecutableSchema } from '@mpaupulaire/typegql';
 import {
   GraphQLDate,
   GraphQLDateTime,
   GraphQLTime
 } from 'graphql-iso-date';
-import { PubSub } from 'graphql-subscriptions';
-import { bootstrap } from 'vesper';
+import * as graphqlHttp from 'express-graphql'
+import Container from 'typedi';
+
+import { AuthorizationService } from '../Auth/Service';
 import { pubsub } from '../Subscriptions';
+import './User';
 
-import { AuthorizationService } from './services/Authorization';
+const schema = makeExecutableSchema({
+  resolvers: {
+    Date: GraphQLDate,
+    DateTime: GraphQLDateTime,
+    Time: GraphQLTime,
+  },
+  typeDefs: `
+scalar DateTime
+scalar Time
+scalar Date
+`,
+  PubSub: pubsub,
+  schemas: ['**/*.gql'],
+});
 
-// Modules
-import { UserModule } from './User';
 
-export async function SetUpGraqlQL(app: Application) {
-  const port = parseInt(process.env.PORT || '3100', 10);
-  return bootstrap({
-    customResolvers: {
-      Date: GraphQLDate,
-      DateTime: GraphQLDateTime,
-      EmailAddress,
-      Time: GraphQLTime,
+
+
+export const GraphQLMiddleware = graphqlHttp(async (req) => {
+  return {
+    schema,
+    context: {
+      container: Container.of('req.user.id')
+        .set(AuthorizationService, new AuthorizationService(req.user))
     },
-    expressApp: app,
-    modules: [
-      UserModule,
-    ],
-    port,
-    schemas: ['**/*.gql'],
-    setupContainer: (container, action) => {
-      const req = action.request || { user: undefined };
-      const { user } = req;
-      container.set(AuthorizationService, new AuthorizationService(user));
-      container.set(PubSub, pubsub);
-    },
-    subscriptionAsyncIterator: (triggers) => pubsub.asyncIterator(triggers),
-  }).then(async () => {
-    console.log(`Server is running on port ${port} 🚀`);
-  }).catch((err) => console.log(err));
-}
+    graphiql: true
+  }
+})

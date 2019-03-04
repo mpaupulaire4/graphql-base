@@ -6,8 +6,8 @@ import * as express from 'express';
 import * as helmet from 'helmet';
 import * as morgan from 'morgan';
 import 'reflect-metadata';
-import { authenticate, router as authRouter} from './Auth';
-import { SetUpGraqlQL } from './Data';
+import { AuthRouter, /* isAuthenticated */ } from './Auth';
+import { GraphQLMiddleware } from './Data';
 
 const app = express();
 
@@ -18,11 +18,9 @@ app.use(cors());
 app.use(urlencoded({ extended: true }));
 app.use(json());
 
-app.use('/auth', authRouter);
-app.use('/graphql', authenticate);
+app.use('/auth', AuthRouter);
+app.use('/graphql', GraphQLMiddleware);
 
-SetUpGraqlQL(app);
 
-export {
-  app
-};
+app.listen(3001, () => console.log('statrted'))
+
