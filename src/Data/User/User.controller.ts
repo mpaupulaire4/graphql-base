@@ -8,24 +8,24 @@ export class UserController {
   ) {}
 
   @Query({
-    type: 'User!'
+    type: 'User!',
   })
   public currentUser() {
     return this.auth.user;
   }
 
   @Query({
-    type: '[User!]!'
+    type: '[User!]!',
   })
   public users() {
     return User.find();
   }
 
   @Mutation({
-    type: 'User',
     args: {
-      data: 'UserCreate!'
-    }
+      data: 'UserCreate!',
+    },
+    type: 'User',
   })
   public async createUser({ data }: any) {
     data = AuthorizationService.validateAndHashPassword(data);
@@ -33,10 +33,10 @@ export class UserController {
   }
 
   @Mutation({
-    type: 'User',
     args: {
-      data: 'UserUpdate!'
-    }
+      data: 'UserUpdate!',
+    },
+    type: 'User',
   })
   public async updateUser({ data: { id, ...data } }: any) {
     if (data.password || data.passwordConfirm) {
@@ -46,7 +46,10 @@ export class UserController {
   }
 
   @Mutation({
-    type: 'Boolean'
+    args: {
+      id: 'ID!',
+    },
+    type: 'Boolean',
   })
   public async deleteUser({ id }: any) {
     return User.delete(id);

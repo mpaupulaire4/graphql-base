@@ -3,7 +3,6 @@ import * as JWT from 'passport-jwt';
 import * as Local from 'passport-local';
 
 import { User } from '../Data/User/User.entity';
-import { AuthorizationService } from './Service';
 
 type DoneCalback = (error: Error | null, user?: User | false, other?: any) => void;
 
@@ -17,7 +16,7 @@ passport.use(new Local.Strategy({
       return done(null, false, { messages: 'Incorrect username or password' });
     }
 
-    const match = await AuthorizationService.isPassword(user, password);
+    const match = await user.isPassword(password);
     if (!match) {
       return done(null, false, { messages: 'Incorrect username or password' });
     }

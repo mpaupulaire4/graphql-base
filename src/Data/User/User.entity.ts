@@ -1,6 +1,6 @@
-import * as bcrypt from 'bcrypt';
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Prop, Type } from '@mpaupulaire/typegql';
+import { AuthorizationService } from '../../Auth/Service'
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 @Type()
@@ -23,7 +23,7 @@ export class User extends BaseEntity {
   public email: string;
 
   public async isPassword(password: string): Promise<boolean> {
-    return await bcrypt.compare(password, this.password);
+    return AuthorizationService.isPassword(this, password)
   }
 
 }

@@ -1,41 +1,38 @@
 import { makeExecutableSchema } from '@mpaupulaire/typegql';
+import * as graphqlHttp from 'express-graphql';
 import {
   GraphQLDate,
   GraphQLDateTime,
   GraphQLTime
 } from 'graphql-iso-date';
-import * as graphqlHttp from 'express-graphql'
 import Container from 'typedi';
 
 import { AuthorizationService } from '../Auth/Service';
-import { pubsub } from '../Subscriptions';
+import { PubSub } from './PubSub';
 import './User';
 
 const schema = makeExecutableSchema({
+  logger: console,
+  resolverBuilderOptions: {
+    PubSub,
+  },
   resolvers: {
     Date: GraphQLDate,
     DateTime: GraphQLDateTime,
     Time: GraphQLTime,
   },
-  typeDefs: `
-scalar DateTime
-scalar Time
-scalar Date
-`,
-  PubSub: pubsub,
-  schemas: ['**/*.gql'],
+  typeGeneratorOptions: {
+    schemas: ['src/Data/**/*.gql'],
+  },
 });
-
-
-
 
 export const GraphQLMiddleware = graphqlHttp(async (req) => {
   return {
-    schema,
     context: {
       container: Container.of('req.user.id')
-        .set(AuthorizationService, new AuthorizationService(req.user))
+      .set(AuthorizationService, new AuthorizationService(req.user)),
     },
-    graphiql: true
-  }
-})
+    graphiql: true,
+    schema,
+  };
+});

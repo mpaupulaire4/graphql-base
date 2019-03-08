@@ -2,20 +2,17 @@ import { NextFunction, Request, Response, Router } from 'express';
 import * as jwt from 'jsonwebtoken';
 import * as passport from 'passport';
 
-// import { logger } from '../../config/logger'
+import { logger } from '../Logger'
+import { mailer } from '../Mailer'
 import { User } from '../Data/User/User.entity';
-import { isAuthenticated, IJWTInfo } from './Passport';
+import { IJWTInfo, isAuthenticated } from './Passport';
 import { AuthorizationService } from './Service';
 
-const logger = {
-  error: (e: any) => e,
-};
-
-const TOKEN_EXPIRE = 1000 * 60 * 60 * 24;
-// const FORGOT_TOKEN_EXPIRE = 1000 * 60 * 60 * 24;
+const TOKEN_EXPIRE = process.env.TOKEN_EXPORE || '1d';
+const FORGOT_TOKEN_EXPIRE = process.env.FORGOT_TOKEN_EXPIRE || TOKEN_EXPIRE;
 
 if (!process.env.TOKEN_SECRET) {
-  throw Error('Must specify env variable TOKEN_SECRET')
+  throw Error('Must specify env variable TOKEN_SECRET');
 }
 
 function RequireFields(fields: string[]) {
@@ -24,8 +21,11 @@ function RequireFields(fields: string[]) {
     res: Response,
     next: NextFunction
   ) => {
-    if (fields.every((arg) => Object.keys(req.body).indexOf(arg) > -1)) { return next(); }
-    else { return res.sendStatus(400); }
+    if (fields.every((arg) => Object.keys(req.body).indexOf(arg) > -1)) {
+      return next();
+    } else {
+      return res.sendStatus(400);
+    }
   };
 }
 
@@ -102,16 +102,16 @@ router.post('/refresh',
  */
 router.post('/forgot',
   RequireFields(['email']),
-  async (_: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // const user = await User.findOneOrFail({ email: req.body.email })
-      // const token = jwt.sign(
-      //   { id: user.id },
-      //   process.env.TOKEN_SECRET || '',
-      //   { expiresIn: FORGOT_TOKEN_EXPIRE },
-      // )
+      const user = await User.findOneOrFail({ email: req.body.email })
+      const token = jwt.sign(
+        { id: user.id },
+        process.env.TOKEN_SECRET || '',
+        { expiresIn: FORGOT_TOKEN_EXPIRE },
+      )
 
-      // await Mailer.sendPasswordResest({email: user.email, token })
+      await mailer.sendPasswordResest({email: user.email, token })
       res.send('Password reset message sent.');
     } catch (e) {
       logger.error(e);
@@ -127,7 +127,7 @@ router.post('/forgot',
 router.get('/reset/:token',
   async (req: Request, res: Response) => {
     try {
-      const data: IJWTInfo = jwt.verify(req.params.token, process.env.TOKEN_SECRET || '') as IJWTInfo
+      const data: IJWTInfo = jwt.verify(req.params.token, process.env.TOKEN_SECRET || '') as IJWTInfo;
       await User.findOneOrFail(data.id);
       res.send('Valid Token');
     } catch (e) {
@@ -151,7 +151,7 @@ router.post('/reset/:token',
       } else {
         user.password = await AuthorizationService.hashPassword(req.body.passowrd);
 
-        // await Mailer.sendPasswordHasBeenResest({email: user.email })
+        await mailer.sendPasswordHasBeenResest({email: user.email })
 
         res.send('Password has been reset');
       }

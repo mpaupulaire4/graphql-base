@@ -1,0 +1,14 @@
+input UserCreate {
+  name: String!
+  email: String!
+  password: String!
+  passwordConfirm: String!
+}
+
+input UserUpdate {
+  id: ID!
+  name: String
+  email: String
+  password: String
+  passwordConfirm: String
+}

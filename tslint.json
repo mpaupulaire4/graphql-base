@@ -19,9 +19,6 @@
       }
     },
     "member-access": true,
-    "no-magic-numbers": {
-      "options": { "ignore-jsx": true }
-    },
     "only-arrow-functions": {
       "options": ["allow-named-functions"]
     },
