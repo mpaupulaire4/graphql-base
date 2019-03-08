@@ -2,9 +2,9 @@ import { NextFunction, Request, Response, Router } from 'express';
 import * as jwt from 'jsonwebtoken';
 import * as passport from 'passport';
 
-import { logger } from '../Logger'
-import { mailer } from '../Mailer'
 import { User } from '../Data/User/User.entity';
+import { logger } from '../Logger';
+import { mailer } from '../Mailer';
 import { IJWTInfo, isAuthenticated } from './Passport';
 import { AuthorizationService } from './Service';
 
@@ -104,14 +104,14 @@ router.post('/forgot',
   RequireFields(['email']),
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const user = await User.findOneOrFail({ email: req.body.email })
+      const user = await User.findOneOrFail({ email: req.body.email });
       const token = jwt.sign(
         { id: user.id },
         process.env.TOKEN_SECRET || '',
-        { expiresIn: FORGOT_TOKEN_EXPIRE },
-      )
+        { expiresIn: FORGOT_TOKEN_EXPIRE }
+      );
 
-      await mailer.sendPasswordResest({email: user.email, token })
+      await mailer.sendPasswordResest({email: user.email, token });
       res.send('Password reset message sent.');
     } catch (e) {
       logger.error(e);
@@ -151,7 +151,7 @@ router.post('/reset/:token',
       } else {
         user.password = await AuthorizationService.hashPassword(req.body.passowrd);
 
-        await mailer.sendPasswordHasBeenResest({email: user.email })
+        await mailer.sendPasswordHasBeenResest({email: user.email });
 
         res.send('Password has been reset');
       }

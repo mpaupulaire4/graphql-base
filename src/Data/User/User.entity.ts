@@ -1,6 +1,6 @@
 import { Prop, Type } from '@mpaupulaire/typegql';
-import { AuthorizationService } from '../../Auth/Service'
 import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { AuthorizationService } from '../../Auth/Service';
 
 @Entity()
 @Type()
@@ -23,7 +23,7 @@ export class User extends BaseEntity {
   public email: string;
 
   public async isPassword(password: string): Promise<boolean> {
-    return AuthorizationService.isPassword(this, password)
+    return AuthorizationService.isPassword(this, password);
   }
 
 }

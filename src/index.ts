@@ -11,7 +11,6 @@ import { AuthRouter, isAuthenticated } from './Auth';
 import { GraphQLMiddleware } from './Data';
 import { logger } from './Logger';
 
-
 const app = express();
 
 app.use(helmet());
