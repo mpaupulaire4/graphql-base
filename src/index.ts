@@ -7,8 +7,10 @@ import * as cors from 'cors';
 import * as express from 'express';
 import * as helmet from 'helmet';
 import * as morgan from 'morgan';
+import { createServer } from 'http';
+
 import { AuthRouter, isAuthenticated } from './Auth';
-import { GraphQLMiddleware } from './Data';
+import { GraphQLMiddleware, SubscriptionsSetup } from './Data';
 import { logger } from './Logger';
 
 const app = express();
@@ -23,4 +25,8 @@ app.use(json());
 app.use('/auth', AuthRouter);
 app.use('/graphql', isAuthenticated, GraphQLMiddleware);
 
-app.listen(3001, () => logger.info(`Server running on port: ${3001}`));
+const server = createServer(app)
+
+SubscriptionsSetup(server, '/graphql')
+
+server.listen(3001, () => logger.info(`Server running on port: ${3001}`));
