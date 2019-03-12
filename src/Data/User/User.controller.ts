@@ -1,7 +1,9 @@
 import { Mutation, Query } from '@mpaupulaire/typegql';
-import { AuthorizationService } from '../../Auth/Service';
+import { AuthorizationService } from '../../Auth';
 import { User } from './User.entity';
+import { Service } from 'typedi';
 
+@Service()
 export class UserController {
   constructor(
     private auth: AuthorizationService

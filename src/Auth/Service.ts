@@ -31,10 +31,6 @@ export class AuthorizationService {
     private currentUser: User
   ) {}
 
-  public isPassword(password: string) {
-    return AuthorizationService.isPassword(this.currentUser, password);
-  }
-
   public isUser(user: User) {
     return this.currentUser.id === user.id;
   }

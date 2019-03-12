@@ -9,8 +9,9 @@ import * as helmet from 'helmet';
 import * as morgan from 'morgan';
 import { createServer } from 'http';
 
-import { AuthRouter, isAuthenticated } from './Auth';
+import { AuthRouter, /* isAuthenticated */ } from './Auth';
 import { GraphQLMiddleware, SubscriptionsSetup } from './Data';
+import { ConnectionPromise } from './Data/DatabaseConnection';
 import { logger } from './Logger';
 
 const app = express();
@@ -23,10 +24,13 @@ app.use(urlencoded({ extended: true }));
 app.use(json());
 
 app.use('/auth', AuthRouter);
-app.use('/graphql', isAuthenticated, GraphQLMiddleware);
+app.use('/graphql', /* isAuthenticated, */ GraphQLMiddleware);
 
-const server = createServer(app)
+app.on('ready', async () => {
+  await ConnectionPromise
+  const server = createServer(app)
+  await SubscriptionsSetup(server, '/graphql')
+  server.listen(3001, () => logger.info(`Server running on port: ${3001}`));
+})
 
-SubscriptionsSetup(server, '/graphql')
-
-server.listen(3001, () => logger.info(`Server running on port: ${3001}`));
+app.emit('ready')

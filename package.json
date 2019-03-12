@@ -8,6 +8,7 @@
   },
   "scripts": {
     "serve": "nodemon -r dotenv/config ./src/index.ts",
+    "typeorn": "typeorm",
     "build": "tsc",
     "lint": "tslint -p tsconfig.json -c tslint.json --fix",
     "prestart": "npm run build",
@@ -27,6 +28,7 @@
     "@types/passport": "^1.0.0",
     "@types/passport-jwt": "^3.0.1",
     "@types/passport-local": "^1.0.33",
+    "@types/ws": "^6.0.1",
     "dotenv": "^6.1.0",
     "nodemon": "^1.12.1",
     "sql.js": "^0.5.0",
