@@ -6,8 +6,8 @@ import * as compression from 'compression';
 import * as cors from 'cors';
 import * as express from 'express';
 import * as helmet from 'helmet';
-import * as morgan from 'morgan';
 import { createServer } from 'http';
+import * as morgan from 'morgan';
 
 import { AuthRouter, /* isAuthenticated */ } from './Auth';
 import { GraphQLMiddleware, SubscriptionsSetup } from './Data';
@@ -27,10 +27,10 @@ app.use('/auth', AuthRouter);
 app.use('/graphql', /* isAuthenticated, */ GraphQLMiddleware);
 
 app.on('ready', async () => {
-  await ConnectionPromise
-  const server = createServer(app)
-  await SubscriptionsSetup(server, '/graphql')
+  await ConnectionPromise;
+  const server = createServer(app);
+  await SubscriptionsSetup(server, '/graphql');
   server.listen(3001, () => logger.info(`Server running on port: ${3001}`));
-})
+});
 
-app.emit('ready')
+app.emit('ready');

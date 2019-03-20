@@ -40,7 +40,7 @@ export const GraphQLMiddleware = graphqlHttp(async (req) => {
     email: 'test@test.test',
     id: 1,
     name: 'Testy Tester',
-  })
+  });
   return {
     context: getContext(req.user || testUser),
     graphiql: true,
@@ -53,7 +53,7 @@ export function SubscriptionsSetup(server: any, path?: string) {
     email: 'sub@test.test',
     id: 1,
     name: 'Sub Testy Tester',
-  })
+  });
   return SubscriptionServer.create({
     execute,
     onConnect: () => {

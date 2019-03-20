@@ -1,14 +1,14 @@
-import { createConnection, getConnectionOptions } from 'typeorm'
+import { createConnection, getConnectionOptions } from 'typeorm';
 import { User } from './User';
 
 async function connect() {
-  const options = await getConnectionOptions()
+  const options = await getConnectionOptions();
   return createConnection({
     ...options,
     entities: [
-      User
+      User,
     ],
-  })
+  });
 }
 
-export const ConnectionPromise = connect()
+export const ConnectionPromise = connect();
