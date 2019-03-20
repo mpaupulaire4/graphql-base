@@ -1,0 +1,8 @@
+input MessageCreate {
+  name: String!
+}
+
+input MessageUpdate {
+  id: ID!
+  name: String
+}

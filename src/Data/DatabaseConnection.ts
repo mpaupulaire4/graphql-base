@@ -1,4 +1,6 @@
 import { createConnection, getConnectionOptions } from 'typeorm';
+// Entity Imports
+import { Message } from './Message';
 import { User } from './User';
 
 async function connect() {
@@ -7,6 +9,7 @@ async function connect() {
     ...options,
     entities: [
       User,
+      Message,
     ],
   });
 }

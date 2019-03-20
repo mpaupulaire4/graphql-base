@@ -1,0 +1,46 @@
+import { Mutation, Query } from '@mpaupulaire/typegql';
+import { Service } from 'typedi';
+import { {{pascalCase DataPoint}} } from './{{pascalCase DataPoint}}.entity';
+
+@Service()
+export class {{pascalCase DataPoint}}Controller {
+  constructor() {}
+
+  @Query({
+    type: '[{{pascalCase DataPoint}}!]!',
+  })
+  public {{camelCase DataPoint}}() {
+    return {{pascalCase DataPoint}}.findOne();
+  }
+
+  @Mutation({
+    args: {
+      data: '{{pascalCase DataPoint}}Create!',
+    },
+    type: '{{pascalCase DataPoint}}',
+  })
+  public async create{{pascalCase DataPoint}}({ data }: any) {
+    return {{pascalCase DataPoint}}.create(data).save();
+  }
+
+  @Mutation({
+    args: {
+      data: '{{pascalCase DataPoint}}Update!',
+    },
+    type: '{{pascalCase DataPoint}}',
+  })
+  public async update{{pascalCase DataPoint}}({ data: { id, ...data } }: any) {
+    return {{pascalCase DataPoint}}.update(id, data);
+  }
+
+  @Mutation({
+    args: {
+      id: 'ID!',
+    },
+    type: 'Boolean',
+  })
+  public async delete{{pascalCase DataPoint}}({ id }: any) {
+    return {{pascalCase DataPoint}}.delete(id);
+  }
+
+}
