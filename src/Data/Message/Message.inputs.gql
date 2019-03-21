@@ -1,8 +1,8 @@
 input MessageCreate {
-  name: String!
+  text: String!
 }
 
 input MessageUpdate {
   id: ID!
-  name: String
+  text: String
 }

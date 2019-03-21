@@ -8,10 +8,12 @@ import * as express from 'express';
 import * as helmet from 'helmet';
 import { createServer } from 'http';
 import * as morgan from 'morgan';
+import playgroundMiddleware from 'graphql-playground-middleware-express';
 
-import { AuthRouter, /* isAuthenticated */ } from './Auth';
-import { GraphQLMiddleware, SubscriptionsSetup } from './Data';
 import { ConnectionPromise } from './Data/DatabaseConnection';
+
+import { AuthRouter, isAuthenticated } from './Auth';
+import { GraphQLMiddleware, SubscriptionsSetup } from './Data';
 import { logger } from './Logger';
 
 const app = express();
@@ -24,7 +26,14 @@ app.use(urlencoded({ extended: true }));
 app.use(json());
 
 app.use('/auth', AuthRouter);
-app.use('/graphql', /* isAuthenticated, */ GraphQLMiddleware);
+app.use('/graphql', isAuthenticated, GraphQLMiddleware);
+
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/playground', playgroundMiddleware({
+    endpoint: '/graphql',
+    subscriptionEndpoint: '/graphql'
+  }));
+}
 
 app.on('ready', async () => {
   await ConnectionPromise;

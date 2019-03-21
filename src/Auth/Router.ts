@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import * as jwt from 'jsonwebtoken';
 import * as passport from 'passport';
 
 import { User } from '../Data/User/User.entity';
@@ -8,12 +7,7 @@ import { mailer } from '../Mailer';
 import { IJWTInfo, isAuthenticated } from './Passport';
 import { AuthorizationService } from './Service';
 
-const TOKEN_EXPIRE = process.env.TOKEN_EXPORE || '1d';
-const FORGOT_TOKEN_EXPIRE = process.env.FORGOT_TOKEN_EXPIRE || TOKEN_EXPIRE;
-
-if (!process.env.TOKEN_SECRET) {
-  throw Error('Must specify env variable TOKEN_SECRET');
-}
+const FORGOT_TOKEN_EXPIRE = process.env.FORGOT_TOKEN_EXPIRE;
 
 function RequireFields(fields: string[]) {
   return (
@@ -32,13 +26,11 @@ function RequireFields(fields: string[]) {
 const router = Router();
 
 router.post('/login',
-  RequireFields(['email', 'passowrd']),
+  RequireFields(['email', 'password']),
   passport.authenticate('local', { session: false }),
   (req: any, res: Response) => {
-    const token = jwt.sign(
-      { id: req.user.id },
-      process.env.TOKEN_SECRET || '',
-      { expiresIn: TOKEN_EXPIRE }
+    const token = AuthorizationService.signToken(
+      { id: req.user.id }
     );
 
     res.set({
@@ -56,14 +48,15 @@ router.post('/login',
  *  password: req.body.password
  */
 router.post('/register',
-  RequireFields(['email', 'passowrd']),
+  RequireFields(['email', 'password', 'name']),
   async (req: Request, res: Response) => {
-    if (!AuthorizationService.isValidPassword(req.body.passowrd)) {
+    if (!AuthorizationService.isValidPassword(req.body.password)) {
       return res.status(400).send("Password doesn't meet requirements");
     }
     try {
       await User.create({
         email: req.body.email,
+        name: req.body.name,
         password: await AuthorizationService.hashPassword(req.body.password),
       }).save();
       return res.sendStatus(200);
@@ -82,10 +75,8 @@ router.post('/register',
 router.post('/refresh',
   isAuthenticated,
   (req: any, res: Response) => {
-    const token = jwt.sign(
-      { id: req.user.id },
-      process.env.TOKEN_SECRET || '',
-      { expiresIn: TOKEN_EXPIRE }
+    const token = AuthorizationService.signToken(
+      { id: req.user.id }
     );
 
     res.set({
@@ -105,10 +96,9 @@ router.post('/forgot',
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = await User.findOneOrFail({ email: req.body.email });
-      const token = jwt.sign(
+      const token = AuthorizationService.signToken(
         { id: user.id },
-        process.env.TOKEN_SECRET || '',
-        { expiresIn: FORGOT_TOKEN_EXPIRE }
+        FORGOT_TOKEN_EXPIRE
       );
 
       await mailer.sendPasswordResest({email: user.email, token });
@@ -121,13 +111,13 @@ router.post('/forgot',
 );
 
 /**
- * GET /auth/reset/:token
+ * GET /auth/forgot/:token
  * checks to see if the provided token is valid.
  */
-router.get('/reset/:token',
+router.get('/forgot/:token',
   async (req: Request, res: Response) => {
     try {
-      const data: IJWTInfo = jwt.verify(req.params.token, process.env.TOKEN_SECRET || '') as IJWTInfo;
+      const data: IJWTInfo = AuthorizationService.verifyToken(req.params.token) as IJWTInfo;
       await User.findOneOrFail(data.id);
       res.send('Valid Token');
     } catch (e) {
@@ -144,12 +134,12 @@ router.post('/reset/:token',
   RequireFields(['password']),
   async (req: Request, res: Response) => {
     try {
-      const data = jwt.verify(req.params.token, process.env.TOKEN_SECRET || '') as IJWTInfo;
+      const data: IJWTInfo = AuthorizationService.verifyToken(req.params.token) as IJWTInfo;
       const user = await User.findOneOrFail(data.id);
       if (!AuthorizationService.isValidPassword(req.body.password)) {
         res.status(400).send("Password doesn't meet requirements");
       } else {
-        user.password = await AuthorizationService.hashPassword(req.body.passowrd);
+        user.password = await AuthorizationService.hashPassword(req.body.password);
 
         await mailer.sendPasswordHasBeenResest({email: user.email });
 

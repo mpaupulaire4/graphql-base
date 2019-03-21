@@ -32,11 +32,10 @@ passport.use(new JWT.Strategy({
   secretOrKey: process.env.TOKEN_SECRET,
 }, async (data: IJWTInfo, done: DoneCalback) => {
   try {
-    const user = await User.findOne({ id: data.id }, { relations: ['organization'] });
+    const user = await User.findOne({ id: data.id });
     if (!user) {
       return done(null, false);
     }
-
     done(null, user);
   } catch (e) {
     done(e);

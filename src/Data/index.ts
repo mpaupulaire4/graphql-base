@@ -8,15 +8,16 @@ import {
 } from 'graphql-iso-date';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { ContainerInstance } from 'typedi';
+import { PubSub } from 'graphql-subscriptions';
 
 import { AuthorizationService } from '../Auth';
-import { PubSub } from './PubSub';
+import { pubsub } from './PubSub';
 import { User } from './User';
 
 const schema = makeExecutableSchema({
   logger: console,
   resolverBuilderOptions: {
-    PubSub,
+    PubSub: pubsub,
   },
   resolvers: {
     Date: GraphQLDate,
@@ -31,33 +32,28 @@ const schema = makeExecutableSchema({
 function getContext(user: User) {
   return {
     container:  new ContainerInstance(user.id)
+      .set(PubSub, pubsub)
       .set(AuthorizationService, new AuthorizationService(user)),
   };
 }
 
 export const GraphQLMiddleware = graphqlHttp(async (req) => {
-  const testUser = User.create({
-    email: 'test@test.test',
-    id: 1,
-    name: 'Testy Tester',
-  });
   return {
-    context: getContext(req.user || testUser),
-    graphiql: true,
+    context: getContext(req.user),
     schema,
   };
 });
 
-export function SubscriptionsSetup(server: any, path?: string) {
-  const testUser = User.create({
-    email: 'sub@test.test',
-    id: 1,
-    name: 'Sub Testy Tester',
-  });
+export function SubscriptionsSetup(server: any, path: string) {
   return SubscriptionServer.create({
     execute,
-    onConnect: () => {
-      return getContext(testUser);
+    onConnect: async (params: any) => {
+      if (!params.Authorization) throw Error('Unauthorized')
+      const [ token ] = params.Authorization.match(/\S+$/)
+      const data = AuthorizationService.verifyToken(token) as {id?: string}
+      if (!data.id) throw Error('Unauthorized')
+      const user = await User.findOneOrFail(data.id)
+      return getContext(user);
     },
     schema,
     subscribe,

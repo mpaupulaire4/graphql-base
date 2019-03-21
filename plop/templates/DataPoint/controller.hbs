@@ -7,7 +7,7 @@ export class {{pascalCase DataPoint}}Controller {
   constructor() {}
 
   @Query({
-    type: '[{{pascalCase DataPoint}}!]!',
+    type: '{{pascalCase DataPoint}}',
   })
   public {{camelCase DataPoint}}() {
     return {{pascalCase DataPoint}}.findOne();

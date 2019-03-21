@@ -11,6 +11,6 @@ export class Message extends BaseEntity {
 
   @Column()
   @Prop()
-  public name: string;
+  public text: string;
 
 }
