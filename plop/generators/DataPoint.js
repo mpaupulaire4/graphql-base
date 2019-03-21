@@ -52,6 +52,7 @@ module.exports = function (plop) {
       },
       {
         type: 'append',
+        abortOnFail: false,
         unique: true,
         template: '      {{pascalCase DataPoint}},',
         pattern: /entities: \[\n(\s*\w+,)*/,
